@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 
-public enum CardSuiteTemplate {
+public enum CardSuiteTemplate implements Template {
     HEART("H"),
     HEART1("H"),
     DIAMOND("D"),

@@ -36,18 +36,21 @@ public class CardMatcherService {
 //                        }
                         List<MatchingPoint> matchingPoints = matchingPointsExtractor(image);
                         if(card.getValue() == null) {
-                            for (CardsTemplate value : CardsTemplate.values()) {
-                                if (matchingPoints.removeAll(value.getMatchingPoints()))
-                                if (value.getMatchingPoints().containsAll(matchingPoints)) {
-                                    card.setValue(value.getCardName());
-                                }
-                            }
+                            card.setValue(((Map.Entry<String, CardsTemplate>)compareMatchingPoints(matchingPoints,true)).getValue().getCardName());
+//                            card.setCardSuite(((Map.Entry<String, CardSuiteTemplate>)compareMatchingPoints(matchingPoints,false)).getValue().getSuitName());
+//                            for (CardsTemplate value : CardsTemplate.values()) {
+//                                if (matchingPoints.removeAll(value.getMatchingPoints()))
+//                                if (value.getMatchingPoints().containsAll(matchingPoints)) {
+//                                    card.setValue(value.getCardName());
+//                                }
+//                            }
                         } else {
-                            for (CardSuiteTemplate suit : CardSuiteTemplate.values()) {
-                                if (suit.getMatchingPoints().containsAll(matchingPoints)) {
-                                    card.setCardSuite(suit.getSuitName());
-                                }
-                            }
+                            card.setCardSuite(((Map.Entry<String, CardSuiteTemplate>)compareMatchingPoints(matchingPoints,false)).getValue().getSuitName());
+//                            for (CardSuiteTemplate suit : CardSuiteTemplate.values()) {
+//                                if (suit.getMatchingPoints().containsAll(matchingPoints)) {
+//                                    card.setCardSuite(suit.getSuitName());
+//                                }
+//                            }
                         }
                     });
             result.append(card.getValue()).append(card.getCardSuite()).append(" ");
@@ -337,15 +340,25 @@ public class CardMatcherService {
         return result;
     }
 
-    private static boolean compareMatchingPoints (List<MatchingPoint> actual, boolean comparingValue) {
-        final Map comparingTable = new HashMap<String, CardsTemplate>();
+    private static Map.Entry<String, ? extends Template> compareMatchingPoints (List<MatchingPoint> actual, boolean comparingValue) {
+        final HashMap comparingTable = new HashMap();
         if(comparingValue) {
 
             for (CardsTemplate cardTemplate : CardsTemplate.values()) {
-
+                List<MatchingPoint> clonedActual = new ArrayList<>(actual);
+                clonedActual.retainAll(cardTemplate.getMatchingPoints());
+                comparingTable.put((float)actual.size() / clonedActual.size(), cardTemplate);
+            }
+        } else {
+            for (CardSuiteTemplate suitTemplate : CardSuiteTemplate.values()) {
+                List<MatchingPoint> clonedActual = new ArrayList<>(actual);
+                clonedActual.retainAll(suitTemplate.getMatchingPoints());
+                comparingTable.put((float)actual.size() / clonedActual.size(), suitTemplate);
             }
         }
 
+        ;
+        return Collections.min(comparingTable.entrySet(), Map.Entry.comparingByKey());
     }
 
 }

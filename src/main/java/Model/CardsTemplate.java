@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 
-public enum CardsTemplate {
+public enum CardsTemplate implements Template{
     TWO("2"),
     THREE("3"),
     FOUR("4"),
